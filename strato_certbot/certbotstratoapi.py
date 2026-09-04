@@ -298,7 +298,7 @@ class CertbotStratoApi:
                 "cID": self.package_id,
                 "node": "ManageDomains",
                 "vhost": self.second_level_domain_name,
-                "spf_type": "NONE",
+                "spf_type": "FAIL",
                 "prefix": [r["prefix"] for r in self.records],
                 "type": [r["type"] for r in self.records],
                 "value": [r["value"] for r in self.records],
