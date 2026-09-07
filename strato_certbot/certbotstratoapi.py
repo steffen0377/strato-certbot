@@ -216,22 +216,11 @@ class CertbotStratoApi:
 
         # Aktuellen SPF-Typ auslesen, damit er beim Zurückschreiben nicht
         # verloren geht / hart überschrieben wird.
-        spf_select = soup.select_one("select[name='spf_type']")
-        print(f"DEBUG: spf_select HTML: {spf_select}")
-
-        # Fallback-Suche: alles finden, dessen name/id/text "spf" enthält
-        for el in soup.find_all(attrs={"name": re.compile("spf", re.IGNORECASE)}):
-            print(f"DEBUG: found element with name~spf: {el}")
-        for el in soup.find_all(attrs={"id": re.compile("spf", re.IGNORECASE)}):
-            print(f"DEBUG: found element with id~spf: {el}")
-        spf_text_el = soup.find(string=re.compile("SPF", re.IGNORECASE))
-        if spf_text_el is not None:
-            print(f"DEBUG: context around SPF text: {spf_text_el.parent.parent}")
-
-        if spf_select is not None:
-            selected_option = spf_select.select_one("option[selected]")
-            if selected_option is not None:
-                self.spf_type = selected_option.get("value", selected_option.text)
+        # SPF-Einstellung wird bei Strato über Radio-Buttons abgebildet:
+        # <input type="radio" name="spf_type" value="..." checked>
+        checked_spf_radio = soup.select_one("input[name='spf_type'][checked]")
+        if checked_spf_radio is not None and checked_spf_radio.has_attr("value"):
+            self.spf_type = checked_spf_radio["value"]
         print(f"INFO: current spf_type: {self.spf_type}")
 
         for recordElement in soup.select("div.txt-record-tmpl"):
