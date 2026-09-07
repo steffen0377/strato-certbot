@@ -55,6 +55,7 @@ class CertbotStratoApi:
         self.session_id = ""
         self.package_id = 0
         self.records = []
+        self.spf_type = "NONE"
 
     def login_2fa(
         self,
@@ -213,6 +214,15 @@ class CertbotStratoApi:
 
         soup = BeautifulSoup(request.text, "html.parser")
 
+        # Aktuellen SPF-Typ auslesen, damit er beim Zurückschreiben nicht
+        # verloren geht / hart überschrieben wird.
+        spf_select = soup.select_one("select[name='spf_type']")
+        if spf_select is not None:
+            selected_option = spf_select.select_one("option[selected]")
+            if selected_option is not None:
+                self.spf_type = selected_option.get("value", selected_option.text)
+        print(f"INFO: current spf_type: {self.spf_type}")
+
         for recordElement in soup.select("div.txt-record-tmpl"):
             prefix_element = recordElement.select_one("input[name='prefix']")
             if prefix_element is None:
@@ -298,7 +308,7 @@ class CertbotStratoApi:
                 "cID": self.package_id,
                 "node": "ManageDomains",
                 "vhost": self.second_level_domain_name,
-                "spf_type": "FAIL",
+                "spf_type": self.spf_type,
                 "prefix": [r["prefix"] for r in self.records],
                 "type": [r["type"] for r in self.records],
                 "value": [r["value"] for r in self.records],
