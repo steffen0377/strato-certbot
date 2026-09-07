@@ -217,6 +217,7 @@ class CertbotStratoApi:
         # Aktuellen SPF-Typ auslesen, damit er beim Zurückschreiben nicht
         # verloren geht / hart überschrieben wird.
         spf_select = soup.select_one("select[name='spf_type']")
+        print(f"DEBUG: spf_select HTML: {spf_select}")
         if spf_select is not None:
             selected_option = spf_select.select_one("option[selected]")
             if selected_option is not None:
