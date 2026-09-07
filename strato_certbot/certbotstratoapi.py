@@ -218,6 +218,16 @@ class CertbotStratoApi:
         # verloren geht / hart überschrieben wird.
         spf_select = soup.select_one("select[name='spf_type']")
         print(f"DEBUG: spf_select HTML: {spf_select}")
+
+        # Fallback-Suche: alles finden, dessen name/id/text "spf" enthält
+        for el in soup.find_all(attrs={"name": re.compile("spf", re.IGNORECASE)}):
+            print(f"DEBUG: found element with name~spf: {el}")
+        for el in soup.find_all(attrs={"id": re.compile("spf", re.IGNORECASE)}):
+            print(f"DEBUG: found element with id~spf: {el}")
+        spf_text_el = soup.find(string=re.compile("SPF", re.IGNORECASE))
+        if spf_text_el is not None:
+            print(f"DEBUG: context around SPF text: {spf_text_el.parent.parent}")
+
         if spf_select is not None:
             selected_option = spf_select.select_one("option[selected]")
             if selected_option is not None:
